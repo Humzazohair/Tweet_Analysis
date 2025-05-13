@@ -16,19 +16,15 @@ def naive_bayes(train_labels, train_text, test_text, laplace=1, pos_prior=0.5):
     print(f"Unigram Laplace: {laplace}")
     print(f"Positive prior: {pos_prior}")
 
-    # TRAINING PHASE
     bags = bag_seperator(train_labels, train_text)
     positive_bag = bags[0]
     negative_bag = bags[1]
-
 
 
     # Creates a hashmap, key = word, value = count of word
     positive_counter = Counter(positive_bag)
     negative_counter = Counter(negative_bag)
     
-
-    # DEVELOPMENT PHASE
 
     positive_map = {}   # key = word, value = P(W = w | Y = Positive)
     negative_map = {}   # key = word, value = P(W = w | Y = Negative)

@@ -11,6 +11,7 @@ def load_data(training_dir, test_dir, validation_dir):
     print(f"Test labels: {Counter(test_labels)}")
     return train_labels, train_text, test_labels, test_text, test_id, validation_labels, validation_text, validation_id
 
+# HELPER FUNCTION: generates bigrams 
 def generate_bigrams(text):
     return [f"{text[i]}_{text[i+1]}" for i in range(len(text) - 1)]
 
@@ -20,7 +21,6 @@ def naive_bayes(train_labels, train_text, test_text, laplace=1, pos_prior=0.5):
     print(f"Unigram Laplace: {laplace}")
     print(f"Positive prior: {pos_prior}")
 
-    # TRAINING PHASE
     bags = bag_seperator(train_labels, train_text)
     positive_bag = bags[0]
     negative_bag = bags[1]
@@ -31,8 +31,6 @@ def naive_bayes(train_labels, train_text, test_text, laplace=1, pos_prior=0.5):
     positive_counter = Counter(positive_bag)
     negative_counter = Counter(negative_bag)
     
-
-    # DEVELOPMENT PHASE
 
     positive_map = {}   # key = word, value = P(W = w | Y = Positive)
     negative_map = {}   # key = word, value = P(W = w | Y = Negative)

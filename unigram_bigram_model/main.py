@@ -17,9 +17,9 @@ POS_PRIOR = 0.5
 
 def compute_accuracies(predicted_labels, test_labels):
     yhats = predicted_labels
-    
     assert len(yhats) == len(test_labels), "predicted and target label lists have different lengths"
-    accuracy = sum([yhats[i] == test_labels[i] for i in range(len(yhats))]) / len(yhats)
+    # Sums all the times that the predictions were right divided by how the length of the dataset
+    accuracy = sum([yhats[i] == test_labels[i] for i in range(len(yhats))]) / len(yhats) 
 
     return accuracy
 
@@ -30,7 +30,9 @@ def print_stats(accuracy, numvalues):
     print(f"Accuracy: {accuracy:.4f}")
     print(f"Total number of samples: {numvalues}")
 
+
 def create_prediction_csv(predicted_labels, test_labels, test_id, output_file):  
+    # this creates a csv with the predictions for kaggle submission
     with open(output_file, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Id", "Label"])
         writer.writeheader()
@@ -38,14 +40,16 @@ def create_prediction_csv(predicted_labels, test_labels, test_id, output_file):
             writer.writerow({"Id" : test_id[i], "Label" : predicted_labels[i]})
 
 def run_unigram_bigram_model(train_labels, train_text, validation_text):
+    # Runs the combined model
     unigram_probabilities = unb.naive_bayes(train_labels, train_text, validation_text, UNIGRAM_LAPLACE, POS_PRIOR)
     bigram_probabilities = bnb.naive_bayes(train_labels, train_text, validation_text, BIGRAM_LAPLACE, POS_PRIOR)
 
+    # Adds the log probabilities of tweets
     predictions = []
     for i in range(len(unigram_probabilities)):
-            pos_prob = unigram_probabilities[i][0]  + bigram_probabilities[i][0]
-            neg_prob = unigram_probabilities[i][1] + bigram_probabilities[i][1]
-            predictions.append("INFORMATIVE" if pos_prob > neg_prob else "UNINFORMATIVE")
+            pos_prob = unigram_probabilities[i][0]  + bigram_probabilities[i][0] # The positive probability for a tweet from both models
+            neg_prob = unigram_probabilities[i][1] + bigram_probabilities[i][1] # The negative probability for a tweet from both models
+            predictions.append("INFORMATIVE" if pos_prob > neg_prob else "UNINFORMATIVE") # Predicts based on higher probability
     return predictions
 
 def main():
@@ -53,9 +57,7 @@ def main():
 
     if VALIDATION:
         predicted_labels = run_unigram_bigram_model(train_labels, train_text, validation_text)
-        create_prediction_csv(predicted_labels, validation_labels, validation_id, "validation_predictions.csv")
-        print(len(predicted_labels))
-        print(len(validation_labels))
+        create_prediction_csv(predicted_labels, validation_labels, validation_id, "unigram_bigram_prediction.csv")
         accuracy = compute_accuracies(predicted_labels, validation_labels)
         print_stats(accuracy, len(validation_labels))
     else:
